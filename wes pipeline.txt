@@ -1,0 +1,81 @@
+conda下载地址：wget https://mirrors.ustc.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+
+install softwares: sra-tools,fastqc,multiqc,vcftools,bcftools,qualimap, trim-galore, gatk and related reference data 
+
+ download gatk bundle:
+   lftp ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/
+	下载 get mirror等
+downloading test data from sra:
+    tar -zxvf  
+    fastq-dump -v --split-3 --gzip SRR645165
+    sra文件转化为fastq：fastq-dump ./SRR645165 --split-3 --gzip -O ./ -v   
+
+1.质控
+mkdir project && cd project
+mkdir {raw,clean,qc,align,mutation}
+cd qc
+fastqc ../raw/* -t 10 -o ./   ##10线程 输出到当前目录
+multiqc -n raw ./
+
+过滤
+cd ../clean
+trim_galore  --paired -q 20 --phred33 --length 36 -e 0.1  --gzip ../raw/SRR10194468.1_1.fa
+stq.gz  ../raw/SRR10194468.1_2.fastq.gz
+
+bash qc.sh
+（过滤后仍需fastaqc质控）
+
+bwa构建索引
+cd ~/qytang/gatk/hg38
+gzip -d Homo_sapiens_assembly38.fasta.gz
+bwa index Homo_sapiens_assembly38.fasta ##生成索引文件 .amb .ann .bwt .pac .sa
+
+构建小的测试文件并进行测试
+cd ~/qytang/test
+mkdir small && cd small
+find ../clean/ -name *val*.fq.gz > fq.txt
+cat fq.txt | while read id ; do (zcat $id|head -10000 > $(basename $id ".gz")) ; done
+bash align.sh
+
+正式比对
+cd ../align
+cp ../clean/*val*.fq.gz ./
+bash align.sh（注意视具体情况修改脚本）
+
+查看bam文件
+samtools view -H SRR10194468.bam | grep -v "SQ"
+
+bam文件质控
+mkdir stats
+bash stats.sh
+
+GATK流程
+cd ~/qytang/test/mutation
+copy ../align/*.bam ./
+find -name "*.bam" | while read id; do basename ${id} .bam; done > config
+bash ../gatk_run.sh
+
+bam质控
+cd ~/qytang/test/mutation
+mkdir bamqc
+mv  ./*_bqsr.bam ./bamqc
+cd bamqc
+ls *.bam | while read id;do (samtools flagstat $id > $(basename $id ".bam").stat);done
+multiqc ./*.stat
+
+python脚本 transtobed.py 制作外显子覆盖参考文件(有问题？)
+外显子覆盖参考文件 ~/qytang/gatk/hg38/hg38.exon.bed
+
+
+bash qualimapbamqc.sh
+multiqc ./*_bqsr_stats
+
+为vcf文件生成index
+gatk IndexFeatureFile -I (vcf file)
+
+可视化vcf文件
+java -jar ~/bin/DISCVRSeq-1.3.8.jar  VariantQC -O raw.vcf.html  -R /mnt/sdafir/qytang/gatkresource/Homo_sapiens_assembly38.fasta -V combined.raw.vcf.gz
+java -jar ~/bin/DISCVRSeq-1.3.8.jar  VariantQC -O VQSR.vcf.html  -R /mnt/sdafir/qytang/gatkresource/Homo_sapiens_assembly38.fasta -V VQSR.vcf.gz
+
+
+

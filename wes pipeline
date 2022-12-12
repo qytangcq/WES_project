@@ -1,16 +1,4 @@
-conda下载地址：wget https://mirrors.ustc.edu.cn/anaconda/miniconda/Miniconda3-latest-Linux-x86_64.sh 
 
-install softwares: sra-tools,fastqc,multiqc,vcftools,bcftools,qualimap, trim-galore, gatk and related reference data 
-
- download gatk bundle:
-   lftp ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/
-	下载 get mirror等
-downloading test data from sra:
-    tar -zxvf  
-    fastq-dump -v --split-3 --gzip SRR645165
-    sra文件转化为fastq：fastq-dump ./SRR645165 --split-3 --gzip -O ./ -v   
-
-1.质控
 mkdir project && cd project
 mkdir {raw,clean,qc,align,mutation}
 cd qc
@@ -76,6 +64,3 @@ gatk IndexFeatureFile -I (vcf file)
 可视化vcf文件
 java -jar ~/bin/DISCVRSeq-1.3.8.jar  VariantQC -O raw.vcf.html  -R /mnt/sdafir/qytang/gatkresource/Homo_sapiens_assembly38.fasta -V combined.raw.vcf.gz
 java -jar ~/bin/DISCVRSeq-1.3.8.jar  VariantQC -O VQSR.vcf.html  -R /mnt/sdafir/qytang/gatkresource/Homo_sapiens_assembly38.fasta -V VQSR.vcf.gz
-
-
-

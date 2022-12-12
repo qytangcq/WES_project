@@ -1,6 +1,6 @@
 nohup bcftools norm -m-both sentieon_bleeding_snps_VQSR.vcf.gz -o  bleeding.vcf &
 nohup bcftools norm -m-both sentieon_control_snps_VQSR.vcf.gz -o control.vcf &
-nohup bcftools norm -f /mnt/sdafir/qytang/gatkresource/Homo_sapiens_assembly38.fasta control_VQSR_norm.vcf.gz -o control_VQSR_norm_2.vcf &
+nohup  &
 
 vcftools --vcf bleeding.vcf --max-missing 0.5 --mac 3 --minQ 30  --remove-filtered VQSRTrancheSNP99.90to100.00  --remove-filtered VQSRTrancheSNP99.90to100.00+ --recode --recode-INFO-all --out bleeding.filtered.vcf
 	过滤掉缺失率高于50%的位点  2115885
@@ -71,7 +71,7 @@ plink --bfile bleeding_7 --extract indepSNP.prune.in    --het --out R_check --al
 Rscript --no-save check_heterozygosity_rate.R
 Rscript --no-save heterozygosity_outliers_list.R
 
-sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt	
+sed 's/"// g' fail-het-qc.txt | awk '{print$1, $2}'> het_fail_ind.txt
 plink --bfile bleeding_7 --remove het_fail_ind.txt --make-bed --out bleeding_8 --allow-extra-chr --allow-no-sex 2295384
 
 plink --bfile bleeding_8 --extract indepSNP.prune.in --genome --min 0.2 --out pihat_min0.2 --allow-extra-chr --allow-no-sex

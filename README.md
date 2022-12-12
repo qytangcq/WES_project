@@ -17,7 +17,7 @@ conda config --set show_channel_urls yes
 conda  create -n wes
 ```
 
-softwares such as  sra-tools,fastqc,multiqc,vcftools,bcftools,qualimap,trim-galore,gatk etc. should be installed by `conda search *** ` and `conda install ***` or installed manually according to offical guidence.
+softwares such as  sra-tools,fastqc,multiqc,vcftools,bcftools,qualimap,trim-galore,csvtk,plink(version 1.9 and 2),gatk etc. should be installed by `conda search *** ` and `conda install ***` or installed manually according to offical guidence.
 
 We provide .yaml file created from our own conda enviroment. You can create a enviroment and install the required packages simultaneously with:
 ```sh

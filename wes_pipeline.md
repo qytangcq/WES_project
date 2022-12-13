@@ -2,7 +2,7 @@
 mkdir wes_project
 wd=path_to_work_directory/wes_project
 cd $wd
-mkdir {raw,clean,qc,align,mutation,bamqc,annotation} ##with all fastq file saved in raw fold
+mkdir {raw,clean,qc,align,mutation,bamqc,annotation} ##with all fastq file saved in raw filefold
 ```
 
 ### Quality Control

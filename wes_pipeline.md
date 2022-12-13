@@ -76,7 +76,7 @@ nohup bash align.sh &
 - summary stats of .bam files
 ```sh
 #!/bin/bash
-wd=path_to_work_directory
+wd=path_to_work_directory/wes_project
 gatkresource=path_to_gatk_bundle
 INDEX=${gatkresource}/Homo_sapiens_assembly38.fasta
 cd $wd/align
@@ -264,7 +264,7 @@ cat case_VQSR_norm_filtered.vcf |awk -v OFS="\t" '/^#/|| $3=$1"_"$2{print $0}' >
 - annotate .vcf with ANNOVAR
 ```
 ###with ANNOVAR installed and its ref data downloaded, directory written to $PATH
-wd=path_to_work_directory
+wd=path_to_work_directory/wes_project
 db=path_to_annovar_humandb
 convert2annovar.pl -format vcf4 -allsample -withfreq case_VQSR_norm_filtered_snpID.vcf  -out $wd/annotation/case.avinput
 table_annovar.pl $wd/annotation/case.avinput ${db} -buildver hg38 -out $wd/annotation/case -remove -protocol refGene,avsnp150,clinvar_20210501,dbnsfp42c,exac03,intervar_20180118,EAS.sites.2015_08 -operation g,f,f,f,f,f,f -nastring NA -csvout
@@ -302,7 +302,7 @@ csvtk -H join -f 1,2,3,4,5 case_control.harmonised.csv case.avinput.csv | csvtk 
 ```
 
 ```R
-##wd=path_to_work_directory
+##wd=path_to_work_directory/wes_project
 
 rm(list=ls())
 setwd("$wd/annotation")
@@ -352,7 +352,7 @@ cat fisher_snp_af_detail.csv | csvtk filter2 -f '$p_ad<0.05' |csvtk mutate -f Po
 #### GWAS (optional in case of low power when sample size is small)
 ```sh
 ##requiring plink
-wd=path_to_work_directory
+wd=path_to_work_directory/wes_project
 cd $wd
 mkdir gwas && cd gwas
 conda activate wes
@@ -410,7 +410,7 @@ In our study, previous sreening of variants led to a group of candidate SNV, ann
 
 based on case_control.harmonised.af.csv, build .bed files recording the chrom,chromStart and chromEnd information, so as a subset of vcf file could be created
 ```sh
-wd=path_to_work_directory
+wd=path_to_work_directory/wes_project
 cd $wd && mkdir SKAT && cd SKAT
 conda activate wes
 
@@ -419,7 +419,7 @@ cat $wd/annotation/case_control.harmonised.ad.csv |csvtk cut -f 1,2,3,7 > SNP_li
 mkdir genebed
 ```
 ```R
-#wd=path_to_work_directory
+#wd=path_to_work_directory/wes_project
 setwd(dir="$wd/SKAT")
 
 library(tidyverse)
@@ -453,7 +453,7 @@ cat gene_name |while read i;do (plink --file plink/${i} --make-bed --out plink/$
 cat gene_name |while read i;do (plink2 --bfile plink/${i} --make-bed out plink/${i}_undup --rm-dup force-first --allow-extra-chr --allow-no-sex);done
 ```
 ```R
-#wd=path_to_work_directory
+#wd=path_to_work_directory/wes_project
 setwd(dir="$wd/SKAT")
 
 library(tidyverse)
@@ -513,7 +513,7 @@ cat indiv.list |while read i;do (table_annovar.pl indivvcf/${i}.recode.vcf ${db}
 cd indivanno  && for i in *.hg38_multianno.txt;do (sample=`echo $i|awk -F '.' '{print $1}'`;cut -f '1-10' ${i}|sed '1d'|sed "s/$/\t${sample}/">>$wd/SKAT/all_anno.txt);done
 ```
 ```R
-#wd=path_to_work_directory
+#wd=path_to_work_directory/wes_project
 setwd(dir="$wd/SKAT")
 library(tidyverse)
 library(maftools)
